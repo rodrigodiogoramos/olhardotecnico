@@ -188,7 +188,6 @@
     </header>
 
     <main>
-        <!-- Seção de Análise Automatizada -->
         <section id="automated-analysis" class="section-container">
             <h2 class="section-title">Análise de Jogo</h2>
             <div class="input-group">
@@ -216,7 +215,6 @@
             </div>
         </section>
 
-        <!-- Seção 1: Estrutura da Análise de Jogos -->
         <section id="analise-jogos" class="section-container">
             <h2 class="section-title">1. Estrutura da Análise de Jogos</h2>
             
@@ -258,7 +256,6 @@
             <textarea id="s1-final-comment" class="editable-general-text" rows="3"></textarea>
         </section>
 
-        <!-- Seção 2: Framework de Desenvolvimento do Atleta -->
         <section id="framework-desenvolvimento" class="section-container">
             <h2 class="section-title">2. Framework de Desenvolvimento do Atleta</h2>
             
@@ -293,7 +290,6 @@
             </div>
         </section>
 
-        <!-- Seção 3: Considerações do Avaliador -->
         <section id="consideracoes-avaliador" class="section-container">
             <h2 class="section-title">3. Considerações do Avaliador</h2>
             <textarea id="s3-intro" class="editable-general-text" rows="2"></textarea>
@@ -317,14 +313,12 @@
             </ul>
         </section>
 
-        <!-- Seção 4: Avaliação Detalhada -->
         <section id="avaliacao-detalhada" class="section-container">
             <h2 class="section-title">4. Avaliação Detalhada</h2>
             <textarea id="s4-intro" class="editable-general-text" rows="2">Aguardando processamento para gerar exemplos em vídeo...</textarea>
             
             <div id="video-examples-container" class="space-y-8">
-                <!-- Conteúdo gerado dinamicamente -->
-            </div>
+                </div>
 
             <div class="button-group">
                 <button class="btn-secondary" onclick="savePreliminarReport()">Atualizar Relatório Preliminar</button>
@@ -424,7 +418,7 @@
             const playerLevel = document.getElementById('player-level').value;
             const additionalData = document.getElementById('additional-data').value || 'atleta';
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const systemPrompt = "Você é um especialista em análise de Tênis de Mesa. Sua tarefa é gerar 3 exemplos de vídeo distintos e plausíveis (timestamps e descrições) para um ponto específico de uma análise (ponto forte ou a melhorar).";
+            const systemPrompt = "Você é um especialista em análise de vídeo de Tênis de Mesa. Sua tarefa é gerar 3 exemplos de vídeo distintos e plausíveis (timestamps e descrições) para um ponto específico de uma análise (ponto forte ou a melhorar).";
             const userPrompt = `Gere 3 novos exemplos de vídeo para o seguinte ponto de análise: "${title}". O atleta está no nível "${playerLevel}" e é identificado como "${additionalData}". Os timestamps (start/end em segundos) devem ser curtos (5-15 segundos) e plausíveis dentro de um jogo. Retorne apenas o array de exemplos em JSON.`;
             const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } };
             const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
