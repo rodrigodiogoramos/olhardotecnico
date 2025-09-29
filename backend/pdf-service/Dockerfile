@@ -1,12 +1,12 @@
-# Use a imagem base oficial do Python para garantir as dependências do sistema
-FROM python:3.11-slim
+# Use a imagem base oficial do Python
+FROM python:3.11
 
 # Define o diretório de trabalho no contêiner
 WORKDIR /app
 
 # Instala as dependências do sistema necessárias para o WeasyPrint
 RUN apt-get update && \
-    apt-get install -y pango pango-cairo gdk-pixbuf2.0 libffi-dev
+    apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0
 
 # Copia os arquivos de dependência do Python
 COPY requirements.txt .
