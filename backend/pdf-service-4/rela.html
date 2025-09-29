@@ -682,23 +682,17 @@
         };
 
         window.savePreliminarReport = () => { saveState(); alert('Relatório preliminar atualizado com sucesso!'); };
-		window.generateFinalReport = async () => {
+        window.generateFinalReport = () => {
             saveState();
-            const dataToSave = loadState();
+            const dataToSave = loadState(); 
             if (!dataToSave) {
                 alert("Nenhum dado para salvar. Processe uma análise primeiro.");
                 return;
             }
-            
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => button.disabled = true);
-            
             const finalDoc = document.cloneNode(true);
             renderStaticReport(finalDoc, dataToSave);
             finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
-            
             finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
-            
             const chartRenderScript = finalDoc.createElement('script');
             chartRenderScript.textContent = `
                 document.addEventListener('DOMContentLoaded', () => {
@@ -723,46 +717,18 @@
                 });
             `;
             finalDoc.body.appendChild(chartRenderScript);
-            
             const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
-            const apiUrl = 'https://pdf-service-859367579735.us-central1.run.app/generate-pdf';
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/html'
-                    },
-                    body: finalHtml
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                alert(`PDF gerado e armazenado com sucesso! URL: ${result.pdf_url}`);
-                window.open(result.pdf_url, '_blank');
-
-            } catch (error) {
-                console.error("Erro ao gerar o PDF:", error);
-                alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
-            } finally {
-                const editableElements = document.querySelectorAll('input, textarea');
-                editableElements.forEach(el => {
-                    el.disabled = true;
-                });
-                const buttons = document.querySelectorAll('button');
-                buttons.forEach(el => {
-                    el.disabled = true;
-                    el.style.display = 'none';
-                });
-                const finalDocForRender = document.cloneNode(true);
-                renderStaticReport(finalDocForRender, dataToSave);
-                document.body.innerHTML = finalDocForRender.body.innerHTML;
-            }
+            const blob = new Blob([finalHtml], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'analise-de-jogo-final.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            alert('Relatório final gerado e baixado com sucesso!');
         };
-
+        
         const savedData = loadState();
         initializePage(savedData);
     });
