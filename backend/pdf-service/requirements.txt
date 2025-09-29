@@ -1,3 +1,4 @@
 Flask
 WeasyPrint
+Flask-CORS
 gunicorn
