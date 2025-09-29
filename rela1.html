@@ -188,7 +188,6 @@
     </header>
 
     <main>
-        <!-- Seção de Análise Automatizada -->
         <section id="automated-analysis" class="section-container">
             <h2 class="section-title">Análise de Jogo</h2>
             <div class="input-group">
@@ -216,7 +215,6 @@
             </div>
         </section>
 
-        <!-- Seção 1: Estrutura da Análise de Jogos -->
         <section id="analise-jogos" class="section-container">
             <h2 class="section-title">1. Estrutura da Análise de Jogos</h2>
             
@@ -258,7 +256,6 @@
             <textarea id="s1-final-comment" class="editable-general-text" rows="3"></textarea>
         </section>
 
-        <!-- Seção 2: Framework de Desenvolvimento do Atleta -->
         <section id="framework-desenvolvimento" class="section-container">
             <h2 class="section-title">2. Framework de Desenvolvimento do Atleta</h2>
             
@@ -293,7 +290,6 @@
             </div>
         </section>
 
-        <!-- Seção 3: Considerações do Avaliador -->
         <section id="consideracoes-avaliador" class="section-container">
             <h2 class="section-title">3. Considerações do Avaliador</h2>
             <textarea id="s3-intro" class="editable-general-text" rows="2"></textarea>
@@ -317,14 +313,12 @@
             </ul>
         </section>
 
-        <!-- Seção 4: Avaliação Detalhada -->
         <section id="avaliacao-detalhada" class="section-container">
             <h2 class="section-title">4. Avaliação Detalhada</h2>
             <textarea id="s4-intro" class="editable-general-text" rows="2">Aguardando processamento para gerar exemplos em vídeo...</textarea>
             
             <div id="video-examples-container" class="space-y-8">
-                <!-- Conteúdo gerado dinamicamente -->
-            </div>
+                </div>
 
             <div class="button-group">
                 <button class="btn-secondary" onclick="savePreliminarReport()">Atualizar Relatório Preliminar</button>
@@ -431,46 +425,7 @@
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const result = await response.json();
-                if (!response.ok) { const errorText = result?.error?.message || `API request failed with status ${response.status}`; throw new Error(errorText); }
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (jsonText) {
-                    const cleanJsonText = jsonText.match(/\[[\s\S]*\]/)?.[0] || jsonText;
-                    const newExamples = JSON.parse(cleanJsonText);
-                    if (Array.isArray(newExamples) && newExamples.length > 0) {
-                        const videoContainer = itemElement.querySelector('.video-container');
-                        videoContainer.dataset.videos = JSON.stringify(newExamples);
-                        const firstExample = newExamples[0];
-                        const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-                        videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${firstExample.start}&end=${firstExample.end}`;
-                        videoContainer.querySelector('.editable-time:first-of-type').value = toMmss(firstExample.start);
-                        videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(firstExample.end);
-                        videoContainer.querySelector('.editable-text').value = firstExample.description;
-                        saveState();
-                        alert("Novos exemplos gerados com sucesso!");
-                    } else { throw new Error("A IA não retornou exemplos válidos."); }
-                } else { throw new Error("A resposta da IA estava vazia."); }
-            } catch (error) { console.error("Erro ao gerar novos exemplos:", error); alert(error.message || "Não foi possível gerar novos exemplos.");
-            } finally { button.disabled = false; button.textContent = 'Gerar Novos'; }
-        }
-
-        async function callGeminiToResync(event) {
-            const button = event.target;
-            const itemElement = button.closest('.video-item');
-            const description = itemElement.querySelector('.editable-text').value;
-            const title = itemElement.querySelector('.editable-title').value;
-            const apiKey = document.getElementById('api-key').value;
-            if (!apiKey) { alert("Por favor, insira sua Chave de API do Gemini para continuar."); return; }
-            button.disabled = true;
-            button.textContent = 'Sincronizando...';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const systemPrompt = "Você é um assistente de análise de vídeo de Tênis de Mesa. Sua tarefa é encontrar o trecho de tempo (início e fim, em segundos) que melhor corresponde a uma descrição de jogada e determinar o resultado do ponto.";
-            const userPrompt = `Analisando um vídeo de tênis de mesa, encontre o trecho de tempo (início e fim, em segundos) que melhor corresponde ao ponto de análise "${title}", descrito como: "${description}". O clipe deve ter duração suficiente para mostrar o ponto completo. Além disso, determine se o ponto foi ganho ou perdido pelo jogador em foco e atualize a descrição para incluir '(Ponto Ganho)' ou '(Ponto Perdido)' no final. Retorne um objeto JSON com 'start', 'end' e 'new_description'.`;
-            const schema = { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, new_description: { type: "STRING" } } };
-            const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
-                if (!response.ok) { const errorText = result?.error?.message || `API request failed with status ${response.status}`; throw new Error(errorText); }
+                if (!response.ok) { const errorText = result?.error?.message || `A requisição à API falhou com o status ${response.status}`; throw new Error(errorText); }
                 const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (jsonText) {
                     const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
@@ -640,11 +595,11 @@
                     const currentStart = toSeconds(startInput.value);
                     const currentIndex = videoSet.findIndex(v => Math.round(v.start) === Math.round(currentStart));
                     const nextVideo = videoSet[(currentIndex + 1) % videoSet.length];
-                    const videoId = extractYouTubeID(youtubeUrlInput.value) || 'Iyaon7rUS-Q';
+                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
                     videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${nextVideo.start}&end=${nextVideo.end}`;
                     startInput.value = toMmss(nextVideo.start);
                     videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(nextVideo.end);
-                    videoContainer.querySelector('.editable-text').value = nextVideo.description;
+                    videoContainer.querySelector('.editable-text').value = newDescription;
                     saveState();
                 });
             });
@@ -727,17 +682,23 @@
         };
 
         window.savePreliminarReport = () => { saveState(); alert('Relatório preliminar atualizado com sucesso!'); };
-        window.generateFinalReport = () => {
+		window.generateFinalReport = async () => {
             saveState();
-            const dataToSave = loadState(); 
+            const dataToSave = loadState();
             if (!dataToSave) {
                 alert("Nenhum dado para salvar. Processe uma análise primeiro.");
                 return;
             }
+            
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => button.disabled = true);
+            
             const finalDoc = document.cloneNode(true);
             renderStaticReport(finalDoc, dataToSave);
             finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
+            
             finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
+            
             const chartRenderScript = finalDoc.createElement('script');
             chartRenderScript.textContent = `
                 document.addEventListener('DOMContentLoaded', () => {
@@ -762,18 +723,53 @@
                 });
             `;
             finalDoc.body.appendChild(chartRenderScript);
+            
             const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
-            const blob = new Blob([finalHtml], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'analise-de-jogo-final.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-            alert('Relatório final gerado e baixado com sucesso!');
+            const apiUrl = 'https://pdf-gerador-859367579735.us-central1.run.app/api/gerar-pdf';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/html'
+                    },
+                    body: finalHtml
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'analise-de-jogo-final.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert('Relatório final gerado e baixado com sucesso!');
+
+            } catch (error) {
+                console.error("Erro ao gerar o PDF:", error);
+                alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
+            } finally {
+                const editableElements = document.querySelectorAll('input, textarea');
+                editableElements.forEach(el => {
+                    el.disabled = true;
+                });
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(el => {
+                    el.disabled = true;
+                    el.style.display = 'none';
+                });
+                const finalDocForRender = document.cloneNode(true);
+                renderStaticReport(finalDocForRender, dataToSave);
+                document.body.innerHTML = finalDocForRender.body.innerHTML;
+            }
         };
-        
+
         const savedData = loadState();
         initializePage(savedData);
     });
