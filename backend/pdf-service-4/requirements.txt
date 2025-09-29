@@ -1,0 +1,5 @@
+Flask
+Flask-CORS
+weasyprint
+gunicorn
+google-cloud-storage
