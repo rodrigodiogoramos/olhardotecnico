@@ -735,6 +735,7 @@
             const finalDoc = document.cloneNode(true);
             renderStaticReport(finalDoc, dataToSave);
             finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
+            
             finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
             
             const chartRenderScript = finalDoc.createElement('script');
