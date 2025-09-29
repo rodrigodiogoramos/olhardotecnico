@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Jornada de um Atleta - Análise Automatizada (Relatório Final.)</title>
+    <title>A Jornada de um Atleta - Análise Automatizada (Editável v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,710 +28,77 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             margin-top: 2rem;
         }
-        h1 {
-            color: #2c5282;
-            font-size: 2.5rem;
-            font-weight: 800;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        .section-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #2c5282;
-            border-left: 4px solid #2c5282;
-            padding-left: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .table-container th, .table-container td {
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0.5rem;
-        }
-        .card {
-            background-color: #EBF8FF;
-            padding: 1.5rem;
-            border-radius: 10px;
-        }
-        .aspect-w-16 {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
-        }
-        .aspect-w-16 iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .btn-primary, .btn-example, .btn-accent, .btn-resync {
-            background-color: #2c5282;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .btn-primary:hover, .btn-example:hover, .btn-accent:hover, .btn-resync:hover {
-            background-color: #2b6cb0;
-        }
-        .btn-primary:disabled, .btn-accent:disabled, .btn-resync:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-        }
-         .btn-secondary {
-            background-color: #4A5568;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-success {
-            background-color: #10B981;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-accent {
-            background-color: #4c51bf;
-        }
-        .btn-accent:hover {
-             background-color: #434190;
-        }
-        .btn-resync {
-            background-color: #2c7a7b; /* Teal */
-        }
-        .btn-resync:hover {
-            background-color: #285e61;
-        }
-
-        .editable-container {
-            margin-top: 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 0.75rem;
-            background-color: #f7fafc;
-        }
-        .editable-title, .editable-text, .editable-time, .editable-general-text, .editable-list-item-desc, .editable-table-cell, .editable-chart-value {
-            width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-        .editable-list-item-title {
-             width: calc(100% - 1rem);
-             padding: 0.5rem;
-             margin-bottom: 0.5rem;
-             border: 1px solid #cbd5e0;
-             border-radius: 4px;
-             background-color: #fff;
-             font-weight: bold;
-        }
-        .time-input-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .time-input-group label {
-            white-space: nowrap;
-        }
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        .hidden {
-            display: none;
-        }
-        .chart-editor {
-            margin-top: 1rem;
-            padding: 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-        }
-        .chart-editor label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-        .chart-editor input {
-            width: 60px;
-            text-align: right;
-        }
-        .input-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            align-items: center;
-        }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
+    <div class="fixed bottom-0 right-0 p-4">
+        <button id="generate-pdf-btn" onclick="generateFinalReport()" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">
+            Gerar Relatório Final
+        </button>
+    </div>
 
-<div class="container">
-    <header class="text-center py-8">
-        <h1 class="text-3xl md:text-5xl font-extrabold text-custom-blue mb-2">A Jornada de um Atleta</h1>
-        <p class="text-lg text-gray-600">Relatório de Análise de Jogo - Tênis de Mesa</p>
-    </header>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generateFinalReport = async () => {
+                const btn = document.getElementById('generate-pdf-btn');
+                btn.disabled = true;
+                btn.textContent = 'Gerando Relatório...';
 
-    <main>
-        <section id="automated-analysis" class="section-container">
-            <h2 class="section-title">Análise de Jogo</h2>
-            <div class="input-group">
-                <input type="password" id="api-key" placeholder="Cole sua Chave de API do Gemini aqui" value="AIzaSyCEbfAAbJ1KtR3hV-0fRrN9p4LZtZCvf0Q">
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-sm text-blue-600 whitespace-nowrap">Alterar Chave</a>
-            </div>
-            <div class="input-group">
-                <input type="text" id="youtube-url" placeholder="Cole a URL do vídeo do YouTube aqui" class="flex-grow" value="https://www.youtube.com/watch?v=Iyaon7rUS-Q">
-                <button id="load-video-btn" class="btn-primary">Carregar Vídeo</button>
-            </div>
-            <div class="input-group">
-                <select id="player-level">
-                    <option value="Iniciante">Iniciante</option>
-                    <option value="Intermediário">Intermediário</option>
-                    <option value="Avançado">Avançado</option>
-                    <option value="Alto Rendimento" selected>Alto Rendimento</option>
-                </select>
-                <input type="text" id="additional-data" placeholder="Cor da camiseta, nome ou outro dado" class="flex-grow" value="camiseta rosa">
-                <button id="process-evaluation-btn" class="btn-primary">Processar Análise</button>
-            </div>
-             <div id="video-player-container" class="mt-6 hidden">
-                <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
-                    <iframe id="video-player" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-            </div>
-        </section>
+                // Captura o HTML completo do relatório
+                const htmlContent = document.documentElement.outerHTML;
 
-        <section id="analise-jogos" class="section-container">
-            <h2 class="section-title">1. Estrutura da Análise de Jogos</h2>
-            
-            <textarea id="s1-intro" class="editable-general-text" rows="5">Aguardando processamento da análise...</textarea>
-            
-            <h3 class="font-bold text-xl my-4">Análise do Jogo</h3>
+                // URL da nova API no Cloud Run
+				const apiUrl = 'https://pdf-service-a1b2c3d-rj.a.run.app/generate-pdf';
 
-            <div class="card mb-6">
-                <h3 id="s1-stage" class="font-bold text-lg mb-2 text-custom-blue">Estágio de Desenvolvimento</h3>
-                <textarea id="s1-card-p1" class="editable-general-text" rows="3"></textarea>
-                <textarea id="s1-card-p2" class="editable-general-text mt-4" rows="3"></textarea>
-            </div>
-
-            <div class="table-container overflow-x-auto mb-6">
-                <table class="w-full text-sm text-left">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-3 font-semibold text-gray-700">Pontos Fortes</th>
-                            <th class="p-3 font-semibold text-gray-700">Pontos a Melhorar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r1-c1" rows="3"></textarea></td>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r1-c2" rows="3"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r2-c1" rows="3"></textarea></td>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r2-c2" rows="3"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r3-c1" rows="3"></textarea></td>
-                            <td><textarea class="editable-table-cell" data-id="s1-t1-r3-c2" rows="3"></textarea></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-             <label class="font-semibold text-sm text-gray-600">Comentário Final:</label>
-            <textarea id="s1-final-comment" class="editable-general-text" rows="3"></textarea>
-        </section>
-
-        <section id="framework-desenvolvimento" class="section-container">
-            <h2 class="section-title">2. Framework de Desenvolvimento do Atleta</h2>
-            
-            <textarea id="s2-intro" class="editable-general-text" rows="2"></textarea>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                <div class="card">
-                    <h3 class="font-bold text-lg mb-3 text-center">Habilidades Gerais</h3>
-                    <div class="chart-container" style="height: 300px;">
-                        <canvas id="generalSkillsChart"></canvas>
-                    </div>
-                    <div class="chart-editor">
-                        <label>Técnica: <input type="number" class="editable-chart-value" data-chart="general" data-index="0" value="0" min="0" max="10"></label>
-                        <label>Tática: <input type="number" class="editable-chart-value" data-chart="general" data-index="1" value="0" min="0" max="10"></label>
-                        <label>Físico: <input type="number" class="editable-chart-value" data-chart="general" data-index="2" value="0" min="0" max="10"></label>
-                        <label>Mental: <input type="number" class="editable-chart-value" data-chart="general" data-index="3" value="0" min="0" max="10"></label>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="font-bold text-lg mb-3 text-center">Competências Técnicas</h3>
-                    <div class="chart-container" style="height: 300px;">
-                        <canvas id="technicalSkillsChart"></canvas>
-                    </div>
-                     <div class="chart-editor">
-                        <label>Forehand: <input type="number" class="editable-chart-value" data-chart="technical" data-index="0" value="0" min="0" max="10"></label>
-                        <label>Backhand: <input type="number" class="editable-chart-value" data-chart="technical" data-index="1" value="0" min="0" max="10"></label>
-                        <label>Saque: <input type="number" class="editable-chart-value" data-chart="technical" data-index="2" value="0" min="0" max="10"></label>
-                        <label>Efeito: <input type="number" class="editable-chart-value" data-chart="technical" data-index="3" value="0" min="0" max="10"></label>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="consideracoes-avaliador" class="section-container">
-            <h2 class="section-title">3. Considerações do Avaliador</h2>
-            <textarea id="s3-intro" class="editable-general-text" rows="2"></textarea>
-            <ul class="list-disc list-inside space-y-3 text-gray-700 mt-4">
-                <li>
-                    <input type="text" class="editable-list-item-title" data-id="s3-l1-title" value="Técnica:">
-                    <textarea class="editable-list-item-desc" data-id="s3-l1-desc" rows="2"></textarea>
-                </li>
-                 <li>
-                    <input type="text" class="editable-list-item-title" data-id="s3-l2-title" value="Tática:">
-                    <textarea class="editable-list-item-desc" data-id="s3-l2-desc" rows="2"></textarea>
-                </li>
-                 <li>
-                    <input type="text" class="editable-list-item-title" data-id="s3-l3-title" value="Físico:">
-                    <textarea class="editable-list-item-desc" data-id="s3-l3-desc" rows="2"></textarea>
-                </li>
-                 <li>
-                    <input type="text" class="editable-list-item-title" data-id="s3-l4-title" value="Mental:">
-                    <textarea class="editable-list-item-desc" data-id="s3-l4-desc" rows="2"></textarea>
-                </li>
-            </ul>
-        </section>
-
-        <section id="avaliacao-detalhada" class="section-container">
-            <h2 class="section-title">4. Avaliação Detalhada</h2>
-            <textarea id="s4-intro" class="editable-general-text" rows="2">Aguardando processamento para gerar exemplos em vídeo...</textarea>
-            
-            <div id="video-examples-container" class="space-y-8">
-                </div>
-
-            <div class="button-group">
-                <button class="btn-secondary" onclick="savePreliminarReport()">Atualizar Relatório Preliminar</button>
-                <button class="btn-success" onclick="generateFinalReport()">Gerar Relatório Final</button>
-            </div>
-        </section>
-    </main>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const storageKey = 'analise-jogo-dados-v3';
-        let generalSkillsChart, technicalSkillsChart;
-
-        // --- Funções de UI ---
-        const loadVideoBtn = document.getElementById('load-video-btn');
-        const processEvaluationBtn = document.getElementById('process-evaluation-btn');
-        const youtubeUrlInput = document.getElementById('youtube-url');
-        const videoPlayerContainer = document.getElementById('video-player-container');
-        const videoPlayer = document.getElementById('video-player');
-
-        loadVideoBtn.addEventListener('click', () => {
-            const url = youtubeUrlInput.value;
-            const videoId = extractYouTubeID(url);
-            if (videoId) {
-                videoPlayer.src = `https://www.youtube.com/embed/${videoId}`;
-                videoPlayerContainer.classList.remove('hidden');
-            } else {
-                alert('URL do YouTube inválida.');
-            }
-        });
-        
-        processEvaluationBtn.addEventListener('click', callGeminiAPI);
-
-        function extractYouTubeID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        // --- Funções de Tempo ---
-        const toSeconds = (time) => {
-            if (!time) return 0;
-            const parts = time.split(':').map(Number);
-            return parts.length > 1 ? parts[0] * 60 + parts[1] : parts[0];
-        };
-        const toMmss = (seconds) => {
-            if (isNaN(seconds)) return "00:00";
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.round(seconds % 60);
-            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-        };
-        
-        // --- Gemini API Call ---
-        async function callGeminiAPI() {
-            const apiKeyInput = document.getElementById('api-key');
-            const apiKey = apiKeyInput.value;
-            if (!apiKey) {
-                alert("Por favor, insira sua Chave de API do Gemini para continuar.");
-                apiKeyInput.focus();
-                return;
-            }
-            processEvaluationBtn.disabled = true;
-            processEvaluationBtn.textContent = 'Processando...';
-            const playerLevel = document.getElementById('player-level').value;
-            const additionalData = document.getElementById('additional-data').value || 'atleta';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const systemPrompt = "Você é um consultor de Tênis de Mesa altamente especializado. Sua função é gerar uma análise de desempenho detalhada e plausível para um atleta, baseando-se no nível de desenvolvimento fornecido. Você deve preencher todos os campos de um relatório estruturado em JSON. As notas de 0 a 10 devem ser coerentes com o nível do atleta (e.g., Alto Rendimento terá notas altas, Iniciante terá notas baixas). As análises, pontos fortes/fracos e recomendações devem ser específicas, acionáveis e apropriadas para o nível.";
-            const userPrompt = `Gere uma análise de jogo completa para um atleta de Tênis de Mesa. Nível do Atleta: ${playerLevel}. Informações Adicionais (identificação no vídeo): ${additionalData}. Os timestamps para os exemplos de vídeo (start/end em segundos) devem ser curtos (5-15 segundos de duração) e plausíveis dentro de um jogo (e.g., entre 0 e 300 segundos). Para cada exemplo de vídeo, determine se o ponto foi ganho ou perdido e inclua '(Ponto Ganho)' ou '(Ponto Perdido)' no final da descrição. Forneça a resposta estritamente no formato JSON definido, com EXATAMENTE 3 pontos fortes, 3 pontos fracos, 4 valores para habilidades gerais e 4 para competências técnicas.`;
-            const schema = { type: "OBJECT", properties: { stage: { type: "STRING" }, s1_intro: { type: "STRING" }, s1_card_p1: { type: "STRING" }, s1_card_p2: { type: "STRING" }, strengths: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, weaknesses: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, final_comment: { type: "STRING" }, general_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, technical_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, s3_intro: { type: "STRING" }, recommendations: { type: "OBJECT", properties: { "Técnica": { type: "STRING" }, "Tática": { type: "STRING" }, "Físico": { type: "STRING" }, "Mental": { type: "STRING" } } }, video_examples: { type: "OBJECT", properties: { strengths: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } }, weaknesses: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, examples: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } } } } } } } };
-            const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
-
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
-                if (!response.ok) { const errorText = result?.error?.message || `A requisição à API falhou com o status ${response.status}`; throw new Error(errorText); }
-                if (!result.candidates || result.candidates.length === 0) { let errorMessage = "A IA não retornou uma análise válida."; if (result.promptFeedback && result.promptFeedback.blockReason) { errorMessage += ` Motivo: ${result.promptFeedback.blockReason}. Por favor, ajuste o texto de entrada.`; } throw new Error(errorMessage); }
-                const jsonText = result.candidates[0]?.content?.parts?.[0]?.text;
-                if (!jsonText) { throw new Error("A resposta da IA estava vazia. Tente novamente."); }
-                try { 
-                    const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
-                    const parsedData = JSON.parse(cleanJsonText); 
-                    populateReport(parsedData); 
-                } catch (parseError) { console.error("Falha ao processar o JSON do Gemini:", jsonText); throw new Error("A IA retornou uma resposta em formato inválido. Por favor, tente novamente."); }
-            } catch (error) { console.error("Erro ao chamar a API do Gemini:", error); alert(error.message || "Ocorreu um erro ao processar a análise. Por favor, tente novamente.");
-            } finally { processEvaluationBtn.disabled = false; processEvaluationBtn.textContent = 'Processar Análise'; }
-        }
-
-        async function callGeminiForNewExamples(event) {
-            const button = event.target;
-            const itemElement = button.closest('.video-item');
-            const title = itemElement.querySelector('.editable-title').value;
-            const apiKey = document.getElementById('api-key').value;
-            if (!apiKey) { alert("Por favor, insira sua Chave de API do Gemini para continuar."); return; }
-            button.disabled = true;
-            button.textContent = 'Gerando...';
-            const playerLevel = document.getElementById('player-level').value;
-            const additionalData = document.getElementById('additional-data').value || 'atleta';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const systemPrompt = "Você é um assistente de análise de vídeo de Tênis de Mesa. Sua tarefa é encontrar o trecho de tempo (início e fim, em segundos) que melhor corresponde a uma descrição de jogada e determinar o resultado do ponto.";
-            const userPrompt = `Analisando um vídeo de tênis de mesa, encontre o trecho de tempo (início e fim, em segundos) que melhor corresponde ao ponto de análise "${title}", descrito como: "${description}". O clipe deve ter duração suficiente para mostrar o ponto completo. Além disso, determine se o ponto foi ganho ou perdido pelo jogador em foco e atualize a descrição para incluir '(Ponto Ganho)' ou '(Ponto Perdido)' no final. Retorne um objeto JSON com 'start', 'end' e 'new_description'.`;
-            const schema = { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, new_description: { type: "STRING" } } };
-            const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
-                if (!response.ok) { const errorText = result?.error?.message || `A requisição à API falhou com o status ${response.status}`; throw new Error(errorText); }
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (jsonText) {
-                    const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
-                    const resyncData = JSON.parse(cleanJsonText);
-                    const start = parseFloat(resyncData.start);
-                    const end = parseFloat(resyncData.end);
-                    const newDescription = resyncData.new_description;
-
-                    if (!isNaN(start) && !isNaN(end) && newDescription) {
-                        const videoContainer = itemElement.querySelector('.video-container');
-                        const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-                        videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${Math.round(start)}&end=${Math.round(end)}`;
-                        itemElement.querySelector('.editable-time:first-of-type').value = toMmss(start);
-                        itemElement.querySelector('.editable-time:last-of-type').value = toMmss(end);
-                        itemElement.querySelector('.editable-text').value = newDescription;
-                        saveState();
-                        alert("Vídeo resincronizado e descrição atualizada com sucesso!");
-                    } else { throw new Error("A IA não retornou dados de resincronização válidos."); }
-                } else { throw new Error("A resposta da IA estava vazia."); }
-            } catch (error) { console.error("Erro ao resincronizar vídeo:", error); alert(error.message || "Não foi possível resincronizar o vídeo.");
-            } finally { button.disabled = false; button.textContent = 'Resincronizar'; }
-        }
-
-        function populateReport(data) {
-            document.getElementById('s1-stage').textContent = `Estágio ${data.stage || 'N/A'}`;
-            document.getElementById('s1-intro').value = data.s1_intro || '';
-            document.getElementById('s1-card-p1').value = data.s1_card_p1 || '';
-            document.getElementById('s1-card-p2').value = data.s1_card_p2 || '';
-            document.getElementById('s1-final-comment').value = data.final_comment || '';
-            const strengthCells = document.querySelectorAll('[data-id^="s1-t1-r"][data-id$="c1"]');
-            const strengths = (Array.isArray(data.strengths) ? data.strengths : []).slice(0, 3);
-            strengths.forEach((item, index) => { if (strengthCells[index]) strengthCells[index].value = item; });
-            const weaknessCells = document.querySelectorAll('[data-id^="s1-t1-r"][data-id$="c2"]');
-            const weaknesses = (Array.isArray(data.weaknesses) ? data.weaknesses : []).slice(0, 3);
-            weaknesses.forEach((item, index) => { if (weaknessCells[index]) weaknessCells[index].value = item; });
-            document.getElementById('s2-intro').value = `A avaliação do jogo resultou nas seguintes notas...`;
-            const generalSkills = (Array.isArray(data.general_skills) ? data.general_skills : [0,0,0,0]).slice(0, 4);
-            const generalInputs = document.querySelectorAll('.editable-chart-value[data-chart="general"]');
-            generalSkills.forEach((val, i) => { if(generalInputs[i]) generalInputs[i].value = val; });
-            const technicalSkills = (Array.isArray(data.technical_skills) ? data.technical_skills : [0,0,0,0]).slice(0, 4);
-            const technicalInputs = document.querySelectorAll('.editable-chart-value[data-chart="technical"]');
-            technicalSkills.forEach((val, i) => { if(technicalInputs[i]) technicalInputs[i].value = val; });
-            createCharts({charts: { general: generalSkills, technical: technicalSkills}});
-            document.getElementById('s3-intro').value = data.s3_intro || '';
-            if (data.recommendations) {
-                Object.keys(data.recommendations).forEach((key, index) => {
-                    const titleEl = document.querySelector(`[data-id="s3-l${index+1}-title"]`);
-                    const descEl = document.querySelector(`[data-id="s3-l${index+1}-desc"]`);
-                    if (titleEl && descEl) {
-                        titleEl.value = key + ':';
-                        descEl.value = data.recommendations[key];
-                    }
-                });
-            }
-            document.getElementById('s4-intro').value = 'Para ilustrar a análise, a seguir são apresentados trechos do jogo...';
-            const videoContainer = document.getElementById('video-examples-container');
-            videoContainer.innerHTML = createVideoExamplesHTML(data.video_examples || { strengths: [], weaknesses: [] });
-            bindReportEventListeners();
-            saveState();
-        }
-
-        function createVideoExamplesHTML(examples) {
-            let html = ``;
-            const strengths = examples.strengths || [];
-            const weaknesses = examples.weaknesses || [];
-
-            if (strengths.length > 0) {
-                html += `<h3 class="font-bold text-lg text-custom-blue mb-4">Pontos Fortes</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">`;
-                strengths.forEach((item, i) => { html += createSingleVideoItem(`pf${i+1}`, item); });
-                html += `</div>`;
-            }
-            if (weaknesses.length > 0) {
-                html += `<h3 class="font-bold text-lg text-custom-blue mb-4">Pontos a Melhorar</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">`;
-                weaknesses.forEach((item, i) => { html += createSingleVideoItem(`pm${i+1}`, item); });
-                html += `</div>`;
-            }
-            return html;
-        }
-
-        function createSingleVideoItem(id, itemData) {
-            const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-            const examplesArray = itemData.examples || [];
-            const firstExample = examplesArray[0] || {start: 0, end: 10, description: 'Exemplo não encontrado.'};
-            const examplesJson = JSON.stringify(examplesArray).replace(/'/g, "&apos;");
-            return `
-            <div class="video-item" data-id="${id}">
-                <div class="editable-title-container">
-                    <input type="text" class="editable-title" value="${itemData.title || ''}">
-                </div>
-                <div class="video-container" data-videos='${examplesJson}'>
-                    <div class="aspect-w-16 aspect-h-9 mb-2 rounded-lg overflow-hidden">
-                        <iframe src="https://www.youtube.com/embed/${videoId}?start=${firstExample.start}&end=${firstExample.end}" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                    <div class="editable-container">
-                        <div class="time-input-group">
-                            <label>Início (mm:ss):</label>
-                            <input type="text" class="editable-time" value="${toMmss(firstExample.start)}">
-                            <label>Fim (mm:ss):</label>
-                            <input type="text" class="editable-time" value="${toMmss(firstExample.end)}">
-                        </div>
-                        <textarea class="editable-text" rows="3">${firstExample.description}</textarea>
-                        <div class="flex gap-2 mt-2 flex-wrap">
-                            <button class="btn-primary update-video">Atualizar</button>
-                            <button class="btn-example change-example flex-grow">Ver Outro</button>
-                            <button class="btn-accent generate-examples flex-grow">Gerar Novos</button>
-                            <button class="btn-resync resincronizar flex-grow">Resincronizar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        }
-        
-        const createCharts = (initialData) => {
-            const chartOptions = { scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 10, pointLabels: { font: { size: 14, weight: 'bold' }, color: '#4a5568' }, grid: { color: 'rgba(203, 213, 225, 0.5)' }, ticks: { backdropColor: 'rgba(255, 255, 255, 0.8)', stepSize: 2 } } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-            if (generalSkillsChart) { generalSkillsChart.destroy(); }
-            const generalCtx = document.getElementById('generalSkillsChart');
-            if (generalCtx) { const generalData = { labels: ['Técnica', 'Tática', 'Físico', 'Mental'], datasets: [{ label: 'Habilidades Gerais', data: initialData.charts.general, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(59, 130, 246, 1)' }] }; generalSkillsChart = new Chart(generalCtx, { type: 'radar', data: generalData, options: chartOptions }); }
-            if (technicalSkillsChart) { technicalSkillsChart.destroy(); }
-            const technicalCtx = document.getElementById('technicalSkillsChart');
-            if (technicalCtx) { const technicalData = { labels: ['Forehand', 'Backhand', 'Saque', 'Efeito'], datasets: [{ label: 'Competências Técnicas', data: initialData.charts.technical, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 2, pointRadius: 4, pointBackgroundColor: 'rgba(239, 68, 68, 1)' }] }; technicalSkillsChart = new Chart(technicalCtx, { type: 'radar', data: technicalData, options: chartOptions }); }
-        };
-        
-        const saveState = () => {
-            const data = { sections: {}, videos: {}, charts: { general: [], technical: [] }, videoUrl: document.getElementById('youtube-url').value, playerLevel: document.getElementById('player-level').value, additionalData: document.getElementById('additional-data').value };
-            document.querySelectorAll('.editable-general-text, .editable-table-cell, .editable-list-item-title, .editable-list-item-desc').forEach(el => { data.sections[el.id || el.dataset.id] = el.value; });
-            document.querySelectorAll('.video-item').forEach(item => {
-                const id = item.dataset.id;
-                const container = item.querySelector('.video-container');
-                if (container) {
-                    data.videos[id] = { title: item.querySelector('.editable-title').value, description: item.querySelector('.editable-text').value, start: toSeconds(item.querySelector('.editable-time:first-of-type').value), end: toSeconds(item.querySelector('.editable-time:last-of-type').value), examples: JSON.parse(container.dataset.videos.replace(/&apos;/g, "'") || '[]') };
-                }
-            });
-            document.querySelectorAll('.editable-chart-value[data-chart="general"]').forEach(input => data.charts.general.push(parseFloat(input.value) || 0));
-            document.querySelectorAll('.editable-chart-value[data-chart="technical"]').forEach(input => data.charts.technical.push(parseFloat(input.value) || 0));
-            localStorage.setItem(storageKey, JSON.stringify(data));
-        };
-
-        const loadState = () => {
-            const savedData = localStorage.getItem(storageKey);
-            return savedData ? JSON.parse(savedData) : null;
-        };
-        
-        function bindReportEventListeners() {
-            document.querySelectorAll('input, textarea').forEach(el => { el.removeEventListener('input', saveState); el.addEventListener('input', saveState); });
-            document.querySelectorAll('.editable-chart-value').forEach(input => {
-                input.addEventListener('input', () => {
-                    const chart = input.dataset.chart === 'general' ? generalSkillsChart : technicalSkillsChart;
-                    if(chart) { chart.data.datasets[0].data[input.dataset.index] = parseFloat(input.value) || 0; chart.update(); }
-                });
-            });
-            document.querySelectorAll('.update-video').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const item = e.target.closest('.video-item');
-                    const start = toSeconds(item.querySelector('.editable-time:first-of-type').value);
-                    const end = toSeconds(item.querySelector('.editable-time:last-of-type').value);
-                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-                    item.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${Math.round(start)}&end=${Math.round(end)}`;
-                    saveState();
-                });
-            });
-            document.querySelectorAll('.change-example').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const videoContainer = e.target.closest('.video-container');
-                    const videoSet = JSON.parse(videoContainer.dataset.videos.replace(/&apos;/g, "'"));
-                    if (!videoSet || videoSet.length === 0) return;
-                    const startInput = videoContainer.querySelector('.editable-time:first-of-type');
-                    const currentStart = toSeconds(startInput.value);
-                    const currentIndex = videoSet.findIndex(v => Math.round(v.start) === Math.round(currentStart));
-                    const nextVideo = videoSet[(currentIndex + 1) % videoSet.length];
-                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-                    videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${nextVideo.start}&end=${nextVideo.end}`;
-                    startInput.value = toMmss(nextVideo.start);
-                    videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(nextVideo.end);
-                    videoContainer.querySelector('.editable-text').value = newDescription;
-                    saveState();
-                });
-            });
-            document.querySelectorAll('.generate-examples').forEach(button => {
-                button.removeEventListener('click', callGeminiForNewExamples);
-                button.addEventListener('click', callGeminiForNewExamples);
-            });
-            document.querySelectorAll('.resync-video').forEach(button => {
-                button.removeEventListener('click', callGeminiToResync);
-                button.addEventListener('click', callGeminiToResync);
-            });
-        }
-        
-        function initializePage(data) {
-             if (!data) { createCharts({charts: { general: [0,0,0,0], technical: [0,0,0,0]}}); return; }
-             document.getElementById('youtube-url').value = data.videoUrl || 'https://www.youtube.com/watch?v=Iyaon7rUS-Q';
-             document.getElementById('player-level').value = data.playerLevel || 'Alto Rendimento';
-             document.getElementById('additional-data').value = data.additionalData || 'camiseta rosa';
-             if(data.videoUrl) loadVideoBtn.click();
-             document.getElementById('s1-stage').textContent = `Estágio ${data.playerLevel}`;
-             Object.keys(data.sections).forEach(key => {
-                const el = document.getElementById(key) || document.querySelector(`[data-id="${key}"]`);
-                if (el) el.value = data.sections[key];
-             });
-            createCharts({charts: data.charts });
-            const videoContainer = document.getElementById('video-examples-container');
-            const allVideoItems = data.videos ? Object.values(data.videos) : [];
-            const strengths = allVideoItems.slice(0, 3);
-            const weaknesses = allVideoItems.slice(3, 6);
-            const videoData = {
-                strengths: strengths.map(v => ({ title: v.title, examples: v.examples })),
-                weaknesses: weaknesses.map(w => ({ title: w.title, examples: w.examples }))
-            };
-            videoContainer.innerHTML = createVideoExamplesHTML(videoData);
-            bindReportEventListeners();
-        }
-
-        const renderStaticReport = (doc, data) => {
-            doc.getElementById('automated-analysis').remove();
-            doc.querySelectorAll('textarea.editable-general-text').forEach(el => {
-                const p = doc.createElement('p');
-                p.className = el.className.replace('editable-general-text', '').trim();
-                p.textContent = el.value;
-                el.parentElement.replaceChild(p, el);
-            });
-            doc.querySelectorAll('textarea.editable-table-cell').forEach(el => { el.parentElement.textContent = el.value; });
-            doc.querySelectorAll('ul li').forEach(li => {
-                const titleInput = li.querySelector('.editable-list-item-title');
-                const descTextarea = li.querySelector('.editable-list-item-desc');
-                if(titleInput && descTextarea) {
-                    const span = doc.createElement('span');
-                    span.className = 'font-semibold';
-                    span.textContent = titleInput.value + ' ';
-                    li.innerHTML = '';
-                    li.appendChild(span);
-                    li.appendChild(doc.createTextNode(descTextarea.value));
-                }
-            });
-            doc.querySelectorAll('.video-item').forEach(item => {
-                const title = item.querySelector('.editable-title').value;
-                const description = item.querySelector('.editable-text').value;
-                const titleEl = doc.createElement('h4');
-                titleEl.className = 'font-semibold text-base mb-2';
-                titleEl.textContent = title;
-                const titleContainer = item.querySelector('.editable-title-container');
-                if(titleContainer) {
-                    titleContainer.innerHTML = '';
-                    titleContainer.appendChild(titleEl);
-                }
-                const p = doc.createElement('p');
-                p.className = 'text-sm text-gray-600 mt-2';
-                p.textContent = description;
-                const container = item.querySelector('.video-container');
-                if (container) {
-                    container.appendChild(p);
-                    container.removeAttribute('data-videos');
-                }
-            });
-            doc.querySelectorAll('input, .editable-container, .change-example, .update-video, .button-group, .chart-editor, .generate-examples, .resync-video').forEach(el => { if(el) el.remove(); });
-        };
-
-        window.savePreliminarReport = () => { saveState(); alert('Relatório preliminar atualizado com sucesso!'); };
-        window.generateFinalReport = () => {
-            saveState();
-            const dataToSave = loadState(); 
-            if (!dataToSave) {
-                alert("Nenhum dado para salvar. Processe uma análise primeiro.");
-                return;
-            }
-            const finalDoc = document.cloneNode(true);
-            renderStaticReport(finalDoc, dataToSave);
-            finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
-            finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
-            const chartRenderScript = finalDoc.createElement('script');
-            chartRenderScript.textContent = `
-                document.addEventListener('DOMContentLoaded', () => {
-                    const finalData = ${JSON.stringify(dataToSave)};
-                    const chartOptions = {
-                        scales: {
-                            r: {
-                                angleLines: { display: true },
-                                suggestedMin: 0,
-                                suggestedMax: 10,
-                                pointLabels: { font: { size: 14, weight: 'bold' }, color: '#4a5568' },
-                                grid: { color: 'rgba(203, 213, 225, 0.5)' },
-                                ticks: { backdropColor: 'rgba(255, 255, 255, 0.8)', stepSize: 2 }
-                            }
+                try {
+                    // Envia o HTML como JSON para o back-end
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
                         },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    };
-                    if(document.getElementById('generalSkillsChart')) { new Chart(document.getElementById('generalSkillsChart'), { type: 'radar', data: { labels: ['Técnica', 'Tática', 'Físico', 'Mental'], datasets: [{ label: 'Habilidades Gerais', data: finalData.charts.general, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 2 }] }, options: chartOptions }); }
-                    if(document.getElementById('technicalSkillsChart')) { new Chart(document.getElementById('technicalSkillsChart'), { type: 'radar', data: { labels: ['Forehand', 'Backhand', 'Saque', 'Efeito'], datasets: [{ label: 'Competências Técnicas', data: finalData.charts.technical, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 2 }] }, options: chartOptions }); }
-                });
-            `;
-            finalDoc.body.appendChild(chartRenderScript);
-            const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
-            const blob = new Blob([finalHtml], { type: 'text/html' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'analise-de-jogo-final.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-            alert('Relatório final gerado e baixado com sucesso!');
-        };
-        
-        const savedData = loadState();
-        initializePage(savedData);
-    });
-</script>
+                        body: JSON.stringify({ html_content: htmlContent })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Erro do servidor: ${response.status} ${response.statusText}. Detalhes: ${errorData.error}`);
+                    }
+
+                    const result = await response.json();
+                    const pdfUrl = result.pdf_url;
+
+                    // Desabilita a edição e exibe o link para download
+                    const editableElements = document.querySelectorAll('input, textarea');
+                    editableElements.forEach(el => { el.disabled = true; });
+                    
+                    btn.textContent = 'Relatório Final Gerado';
+                    btn.classList.remove('bg-blue-600');
+                    btn.classList.add('bg-green-600');
+                    
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = pdfUrl;
+                    downloadLink.textContent = 'Clique para Baixar o Relatório (PDF)';
+                    downloadLink.target = '_blank';
+                    downloadLink.style.display = 'block';
+                    downloadLink.style.marginTop = '10px';
+                    downloadLink.style.textAlign = 'center';
+
+                    btn.parentNode.insertBefore(downloadLink, btn.nextSibling);
+
+                    alert(`PDF gerado e armazenado com sucesso! A URL para download é: ${pdfUrl}`);
+
+                } catch (error) {
+                    console.error("Erro ao gerar o PDF:", error);
+                    alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
+                    btn.disabled = false;
+                    btn.textContent = 'Gerar Relatório Final';
+                }
+            };
+            
+            // Atribui a função ao botão
+            document.getElementById('generate-pdf-btn').onclick = generateFinalReport;
+        });
+    </script>
 </body>
 </html>
