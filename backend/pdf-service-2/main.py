@@ -2,14 +2,13 @@ import os
 import requests
 import base64
 import sendgrid
-from bs4 import BeautifulSoup
-from weasyprint import HTML
+import pdfkit
 from flask import Flask, request, jsonify
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 
 # --- CONFIGURAÇÃO ---
-# A chave de API do SendGrid é obtida de uma variável de ambiente.
-# Isso garante que ela seja injetada de forma segura pelo Google Cloud Secret Manager.
+# A chave de API do SendGrid é obtida de uma variável de ambiente,
+# garantindo que ela seja injetada de forma segura pelo Google Cloud Secret Manager.
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 
 # Crie a instância da aplicação Flask.
@@ -40,18 +39,12 @@ def processar_pagina_e_enviar_email():
 
     # 2. EXTRAÇÃO E GERAÇÃO DE PDF
     try:
-        # Faz a requisição HTTP para a URL fornecida
-        response = requests.get(url)
-        # Lança um erro se a requisição falhar (código de status >= 400)
-        response.raise_for_status()
+        # pdfkit é mais robusto para renderizar páginas complexas.
+        # Usa a ferramenta wkhtmltopdf no backend do contêiner.
+        pdf_bytes = pdfkit.from_url(url, False, options={'quiet': ''})
 
-        # Usa o WeasyPrint para converter o conteúdo HTML em PDF
-        html_content = response.text
-        pdf_bytes = HTML(string=html_content).write_pdf()
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({'erro': f'Erro ao acessar a URL: {e}'}), 500
     except Exception as e:
+        # A mensagem de erro será mais clara nos logs, mostrando se o wkhtmltopdf não foi encontrado.
         return jsonify({'erro': f'Erro ao gerar o PDF: {e}'}), 500
 
     # 3. ENVIO DO E-MAIL
@@ -84,4 +77,9 @@ def processar_pagina_e_enviar_email():
         response = sg.client.mail.send.post(request_body=mail.get())
 
         if response.status_code == 202:
-            return jsonify({'status': 'sucesso', 'mensagem
+            return jsonify({'status': 'sucesso', 'mensagem': 'E-mail enviado com sucesso.'}), 202
+        else:
+            return jsonify({'status': 'erro', 'mensagem': f'Erro ao enviar o e-mail: {response.body}'}), response.status_code
+
+    except Exception as e:
+        return jsonify({'erro': f'Erro inesperado ao enviar o e-mail: {e}'}), 500
