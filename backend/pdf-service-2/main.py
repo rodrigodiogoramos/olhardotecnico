@@ -1,5 +1,5 @@
 import os
-from flask import Request, jsonify
+from flask import Flask, Request, jsonify
 import requests
 from bs4 import BeautifulSoup
 from weasyprint import HTML
@@ -11,6 +11,9 @@ from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileT
 # No ambiente de produção, a chave de API deve ser acessada do Google Cloud Secret Manager.
 # Para testes locais, você pode usar os.getenv('SENDGRID_API_KEY') e um arquivo .env.
 SENDGRID_API_KEY = "SUA_CHAVE_DE_API_DO_SENDGRID" # Substitua pela sua chave
+
+# Create a Flask app instance
+app = Flask(__name__)
 
 def processar_pagina_e_enviar_email(request: Request):
     """
@@ -82,3 +85,12 @@ def processar_pagina_e_enviar_email(request: Request):
 
     except Exception as e:
         return jsonify({'erro': f'Erro inesperado ao enviar o e-mail: {e}'}), 500
+
+# This is the new part for Cloud Run / Cloud Functions 2nd Gen
+@app.route('/', methods=['POST'])
+def handle_request():
+    return processar_pagina_e_enviar_email(app.request)
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
