@@ -6,13 +6,13 @@ WORKDIR /app
 
 # Instala as dependências do sistema necessárias para o WeasyPrint
 RUN apt-get update && \
-    apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0 libgirepository-1.0-1
+    apt-get install -y pango-cairo libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0 libgirepository-1.0-1
 
 # Copia os arquivos de dependência do Python
 COPY requirements.txt .
 
 # Instala as dependências do Python, incluindo o gunicorn
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+RUN pip install --no-cache-dir -r requirements.txt gunicorn Flask-CORS
 
 # Copia o código da aplicação
 COPY . .
