@@ -1,26 +1,31 @@
-# Use uma imagem base Debian que inclui as bibliotecas necessárias.
-# wkhtmltopdf funciona melhor em ambientes Debian.
+# Use a base image that's known to work well with wkhtmltopdf.
 FROM debian:bullseye-slim
 
-# Instala o Python 3.9 e o pip.
+# Install system dependencies.
+# The `xvfb` and `xfonts` packages are crucial for headless rendering.
 RUN apt-get update && apt-get install -y \
     python3.9 \
     python3-pip \
-    wkhtmltopdf
+    wkhtmltopdf \
+    xvfb \
+    xfonts-100dpi \
+    xfonts-75dpi \
+    xfonts-cyrillic
 
-# Define o diretório de trabalho.
+# Set working directory inside the container.
 WORKDIR /app
 
-# Copia e instala as dependências Python.
+# Copy the requirements file and install Python dependencies.
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o código da sua aplicação para o contêiner.
+# Copy your application code.
 COPY . .
 
-# Expõe a porta e define a variável de ambiente.
+# Expose the port that the application will listen on.
 EXPOSE 8080
-ENV PORT=8080
 
-# Comando para iniciar a aplicação com Gunicorn.
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "main:app"]
+# The Gunicorn server starts your application.
+# `xvfb-run` is the key part that runs the process in a virtual display,
+# which is required for wkhtmltopdf to work properly.
+CMD ["xvfb-run", "-a", "gunicorn", "--bind", "0.0.0.0:8080", "main:app"]
