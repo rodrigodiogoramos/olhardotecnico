@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Jornada de um Atleta - Análise Automatizada (Editável v4)</title>
+    <title>A Jornada de um Atleta - Análise Automatizada (Editável v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -620,7 +620,7 @@
                     const item = e.target.closest('.video-item');
                     const start = toSeconds(item.querySelector('.editable-time:first-of-type').value);
                     const end = toSeconds(item.querySelector('.editable-time:last-of-type').value);
-                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
+                    const videoId = extractYouTubeID(youtubeUrlInput.value) || 'Iyaon7rUS-Q';
                     item.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${Math.round(start)}&end=${Math.round(end)}`;
                     saveState();
                 });
@@ -732,22 +732,37 @@
             const buttons = document.querySelectorAll('button');
             buttons.forEach(button => button.disabled = true);
             
-            // 1. Renderiza o relatório em uma versão estática
             const finalDoc = document.cloneNode(true);
             renderStaticReport(finalDoc, dataToSave);
-            
-            // 2. Remove scripts e elementos desnecessários para o PDF
-            finalDoc.querySelectorAll('script').forEach(script => {
-                if (!script.src || !script.src.includes('chart.js')) {
-                    script.remove();
-                }
-            });
             finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
-
-            // 3. Obtém o HTML final para enviar ao Back-end
-            const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
+            finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
             
-            // Substitua esta URL pela URL do seu serviço no Google Cloud Run
+            const chartRenderScript = finalDoc.createElement('script');
+            chartRenderScript.textContent = `
+                document.addEventListener('DOMContentLoaded', () => {
+                    const finalData = ${JSON.stringify(dataToSave)};
+                    const chartOptions = {
+                        scales: {
+                            r: {
+                                angleLines: { display: true },
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                pointLabels: { font: { size: 14, weight: 'bold' }, color: '#4a5568' },
+                                grid: { color: 'rgba(203, 213, 225, 0.5)' },
+                                ticks: { backdropColor: 'rgba(255, 255, 255, 0.8)', stepSize: 2 }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    };
+                    if(document.getElementById('generalSkillsChart')) { new Chart(document.getElementById('generalSkillsChart'), { type: 'radar', data: { labels: ['Técnica', 'Tática', 'Físico', 'Mental'], datasets: [{ label: 'Habilidades Gerais', data: finalData.charts.general, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 2 }] }, options: chartOptions }); }
+                    if(document.getElementById('technicalSkillsChart')) { new Chart(document.getElementById('technicalSkillsChart'), { type: 'radar', data: { labels: ['Forehand', 'Backhand', 'Saque', 'Efeito'], datasets: [{ label: 'Competências Técnicas', data: finalData.charts.technical, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 2 }] }, options: chartOptions }); }
+                });
+            `;
+            finalDoc.body.appendChild(chartRenderScript);
+            
+            const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
             const apiUrl = 'https://pdf-gerador-859367579735.us-central1.run.app/api/gerar-pdf';
 
             try {
@@ -758,7 +773,7 @@
                     },
                     body: finalHtml
                 });
-
+                
                 if (!response.ok) {
                     throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
                 }
@@ -772,14 +787,12 @@
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
-
                 alert('Relatório final gerado e baixado com sucesso!');
 
             } catch (error) {
                 console.error("Erro ao gerar o PDF:", error);
                 alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
             } finally {
-                // 5. Transição para modo de somente leitura (desabilita todos os campos e botões)
                 const editableElements = document.querySelectorAll('input, textarea');
                 editableElements.forEach(el => {
                     el.disabled = true;
@@ -789,13 +802,12 @@
                     el.disabled = true;
                     el.style.display = 'none';
                 });
-
-                // Renderiza a página sem os campos de edição
                 const finalDocForRender = document.cloneNode(true);
                 renderStaticReport(finalDocForRender, dataToSave);
                 document.body.innerHTML = finalDocForRender.body.innerHTML;
             }
         };
+
         const savedData = loadState();
         initializePage(savedData);
     });
