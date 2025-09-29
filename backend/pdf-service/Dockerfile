@@ -11,7 +11,7 @@ RUN apt-get update && \
 # Copia os arquivos de dependência do Python
 COPY requirements.txt .
 
-# Instala as dependências do Python
+# Instala as dependências do Python, incluindo o gunicorn
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o código da aplicação
