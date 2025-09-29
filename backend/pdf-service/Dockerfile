@@ -1,22 +1,24 @@
-# Use a base Python image.
+# Use a imagem base oficial do Python
 FROM python:3.11
 
-# Set the working directory in the container.
+# Define o diretório de trabalho no contêiner
 WORKDIR /app
 
-# Install system dependencies needed for WeasyPrint.
+# Instala as dependências do sistema necessárias para o WeasyPrint
 RUN apt-get update && \
     apt-get install -y pango-cairo libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0 libgirepository-1.0-1
 
-# Copy the requirements file and install Python dependencies.
+# Copia os arquivos de dependência do Python
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code.
+# Instala as dependências do Python, incluindo o gunicorn
+RUN pip install --no-cache-dir -r requirements.txt gunicorn Flask-CORS
+
+# Copia o código da aplicação
 COPY . .
 
-# Expose the port for Gunicorn.
+# Expõe a porta que o Gunicorn vai usar
 EXPOSE 8080
 
-# Command to run the application using Gunicorn.
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+# Define o comando para rodar a aplicação usando o gunicorn
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
