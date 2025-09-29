@@ -1,4 +1,4 @@
-# Use a full Python image to ensure apt-get is available.
+# Use a full Python image to ensure apt-get is available
 FROM python:3.11
 
 # Set the working directory in the container
@@ -7,7 +7,7 @@ WORKDIR /app
 # Install system dependencies needed for WeasyPrint
 # This command is more robust for a standard Debian-based image
 RUN apt-get update && \
-    apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev
+    apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-xlib-2.0-0 libffi-dev
 
 # Copy the requirements file and install Python dependencies
 COPY requirements.txt .
