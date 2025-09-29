@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Instala as dependências do sistema necessárias para o WeasyPrint
 RUN apt-get update && \
-    apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0
+    apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-icu0 libgirepository-1.0-1
 
 # Copia os arquivos de dependência do Python
 COPY requirements.txt .
