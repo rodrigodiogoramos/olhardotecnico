@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Jornada de um Atleta - Análise Automatizada (Editável v3.1)</title>
+    <title>A Jornada de um Atleta - Análise Automatizada (Editável v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -429,6 +429,45 @@
                 const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (jsonText) {
                     const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
+                    const newExamples = JSON.parse(cleanJsonText);
+                    if (Array.isArray(newExamples) && newExamples.length > 0) {
+                        const videoContainer = itemElement.querySelector('.video-container');
+                        videoContainer.dataset.videos = JSON.stringify(newExamples);
+                        const firstExample = newExamples[0];
+                        const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
+                        videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${firstExample.start}&end=${firstExample.end}`;
+                        videoContainer.querySelector('.editable-time:first-of-type').value = toMmss(firstExample.start);
+                        videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(firstExample.end);
+                        videoContainer.querySelector('.editable-text').value = newDescription;
+                        saveState();
+                        alert("Novos exemplos gerados com sucesso!");
+                    } else { throw new Error("A IA não retornou exemplos válidos."); }
+                } else { throw new Error("A resposta da IA estava vazia."); }
+            } catch (error) { console.error("Erro ao gerar novos exemplos:", error); alert(error.message || "Não foi possível gerar novos exemplos.");
+            } finally { button.disabled = false; button.textContent = 'Gerar Novos'; }
+        }
+
+        async function callGeminiToResync(event) {
+            const button = event.target;
+            const itemElement = button.closest('.video-item');
+            const description = itemElement.querySelector('.editable-text').value;
+            const title = itemElement.querySelector('.editable-title').value;
+            const apiKey = document.getElementById('api-key').value;
+            if (!apiKey) { alert("Por favor, insira sua Chave de API do Gemini para continuar."); return; }
+            button.disabled = true;
+            button.textContent = 'Sincronizando...';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const systemPrompt = "Você é um assistente de análise de vídeo de Tênis de Mesa. Sua tarefa é encontrar o trecho de tempo (início e fim, em segundos) que melhor corresponde a uma descrição de jogada e determinar o resultado do ponto.";
+            const userPrompt = `Analisando um vídeo de tênis de mesa, encontre o trecho de tempo (início e fim, em segundos) que melhor corresponde ao ponto de análise "${title}", descrito como: "${description}". O clipe deve ter duração suficiente para mostrar o ponto completo. Além disso, determine se o ponto foi ganho ou perdido pelo jogador em foco e atualize a descrição para incluir '(Ponto Ganho)' ou '(Ponto Perdido)' no final. Retorne um objeto JSON com 'start', 'end' e 'new_description'.`;
+            const schema = { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, new_description: { type: "STRING" } } };
+            const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                if (!response.ok) { const errorText = result?.error?.message || `A requisição à API falhou com o status ${response.status}`; throw new Error(errorText); }
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (jsonText) {
+                    const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
                     const resyncData = JSON.parse(cleanJsonText);
                     const start = parseFloat(resyncData.start);
                     const end = parseFloat(resyncData.end);
@@ -506,7 +545,7 @@
         }
 
         function createSingleVideoItem(id, itemData) {
-            const videoId = extractYouTubeID(youtubeUrlInput.value) || 'Iyaon7rUS-Q';
+            const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
             const examplesArray = itemData.examples || [];
             const firstExample = examplesArray[0] || {start: 0, end: 10, description: 'Exemplo não encontrado.'};
             const examplesJson = JSON.stringify(examplesArray).replace(/'/g, "&apos;");
@@ -776,3 +815,4 @@
 </script>
 </body>
 </html>
+```
