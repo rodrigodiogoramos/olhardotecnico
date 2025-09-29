@@ -12,20 +12,15 @@ from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileT
 # Para testes locais, você pode usar os.getenv('SENDGRID_API_KEY') e um arquivo .env.
 SENDGRID_API_KEY = "SUA_CHAVE_DE_API_DO_SENDGRID" # Substitua pela sua chave
 
-# Create a Flask app instance
+# Crie uma instância do aplicativo Flask
 app = Flask(__name__)
 
-def processar_pagina_e_enviar_email(request: Request):
-    """
-    Função principal que será executada pela Google Cloud Function.
-    Ela extrai uma URL, gera um PDF e envia por e-mail.
-    """
+# A função que contém a sua lógica de negócio
+def processar_pagina_e_enviar_email_logica(request: Request):
     # 1. TRATAMENTO DA REQUISIÇÃO
     try:
-        # Pega o corpo da requisição JSON
         request_json = request.get_json(silent=True)
         
-        # Valida se os dados necessários foram enviados
         if not request_json or 'url' not in request_json or 'email' not in request_json:
             return jsonify({'erro': 'Campos "url" e "email" são obrigatórios.'}), 400
 
@@ -37,14 +32,11 @@ def processar_pagina_e_enviar_email(request: Request):
 
     # 2. EXTRAÇÃO E GERAÇÃO DE PDF
     try:
-        # Faz a requisição HTTP para a URL
         response = requests.get(url)
-        response.raise_for_status() # Lança um erro se a requisição falhar
+        response.raise_for_status()
 
-        # O WeasyPrint pode usar o HTML completo da resposta
         html_content = response.text
         
-        # Cria o PDF a partir do HTML
         pdf_bytes = HTML(string=html_content).write_pdf()
 
     except requests.exceptions.RequestException as e:
@@ -54,10 +46,8 @@ def processar_pagina_e_enviar_email(request: Request):
 
     # 3. ENVIO DO E-MAIL
     try:
-        # Configura o SendGrid
         sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
 
-        # Prepara o anexo
         encoded_file = base64.b64encode(pdf_bytes).decode('utf-8')
         attachedFile = Attachment(
             FileContent(encoded_file),
@@ -66,7 +56,6 @@ def processar_pagina_e_enviar_email(request: Request):
             Disposition('attachment')
         )
 
-        # Monta o e-mail
         mail = Mail(
             from_email='noreply@seudominio.com',
             to_emails=email_destino,
@@ -75,7 +64,6 @@ def processar_pagina_e_enviar_email(request: Request):
         )
         mail.attachment = attachedFile
 
-        # Envia o e-mail
         response = sg.client.mail.send.post(request_body=mail.get())
 
         if response.status_code == 202:
@@ -86,11 +74,11 @@ def processar_pagina_e_enviar_email(request: Request):
     except Exception as e:
         return jsonify({'erro': f'Erro inesperado ao enviar o e-mail: {e}'}), 500
 
-# This is the new part for Cloud Run / Cloud Functions 2nd Gen
+# Esta rota irá expor sua função para a web
 @app.route('/', methods=['POST'])
 def handle_request():
-    return processar_pagina_e_enviar_email(app.request)
+    return processar_pagina_e_enviar_email_logica(app.request)
 
+# Esta é a parte nova para o Cloud Run / Cloud Functions 2ª Geração
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port)
