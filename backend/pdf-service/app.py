@@ -1,9 +1,11 @@
 import os
 from flask import Flask, request, send_file
+from flask_cors import CORS # Importa a extensão Flask-CORS
 from weasyprint import HTML
 import io
 
 app = Flask(__name__)
+CORS(app) # Habilita o CORS para toda a aplicação Flask
 
 # Rota para a API que gera o PDF
 @app.route('/api/gerar-pdf', methods=['POST'])
