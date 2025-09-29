@@ -7,12 +7,12 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-# Rota de health check para a URL base
+# Health check route
 @app.route('/', methods=['GET'])
 def health_check():
     return 'Service is running.'
 
-# Rota para a API que gera o PDF
+# PDF generation route
 @app.route('/api/gerar-pdf', methods=['POST'])
 def gerar_pdf():
     try:

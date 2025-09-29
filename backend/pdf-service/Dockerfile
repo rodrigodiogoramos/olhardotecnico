@@ -1,23 +1,25 @@
-# Use a full Python image to ensure apt-get is available
+# Use a imagem base oficial do Python
 FROM python:3.11
 
-# Set the working directory in the container
+# Define o diretório de trabalho no contêiner
 WORKDIR /app
 
-# Install system dependencies needed for WeasyPrint
-# This command is more robust for a standard Debian-based image
+# Instala as dependências do sistema necessárias para o WeasyPrint
+# O nome do pacote libgdk-pixbuf2.0-0 foi corrigido
 RUN apt-get update && \
     apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-xlib-2.0-0 libffi-dev
 
-# Copy the requirements file and install Python dependencies
+# Copia os arquivos de dependência do Python
 COPY requirements.txt .
+
+# Instala as dependências do Python, incluindo o gunicorn
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
+# Copia o código da aplicação
 COPY . .
 
-# Expose the port for Gunicorn
+# Expõe a porta que o Gunicorn vai usar
 EXPOSE 8080
 
-# Command to run the application using Gunicorn
+# Define o comando para rodar a aplicação usando o gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
