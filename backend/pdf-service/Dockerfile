@@ -19,6 +19,5 @@ ENV HOST=0.0.0.0
 # Expõe a porta que o Gunicorn vai usar
 EXPOSE 8080
 
-# Define o comando para rodar a aplicação usando o gunicorn
-# A flag -w 4 especifica o número de workers.
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+# Define o comando para rodar a aplicação usando o gunicorn, garantindo que ele encontre o arquivo app.py
+CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
