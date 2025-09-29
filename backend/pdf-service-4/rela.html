@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Jornada de um Atleta - Análise Automatizada (Editável v3)</title>
+    <title>A Jornada de um Atleta - Análise Automatizada (Relatório Final)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -388,7 +388,7 @@
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const systemPrompt = "Você é um consultor de Tênis de Mesa altamente especializado. Sua função é gerar uma análise de desempenho detalhada e plausível para um atleta, baseando-se no nível de desenvolvimento fornecido. Você deve preencher todos os campos de um relatório estruturado em JSON. As notas de 0 a 10 devem ser coerentes com o nível do atleta (e.g., Alto Rendimento terá notas altas, Iniciante terá notas baixas). As análises, pontos fortes/fracos e recomendações devem ser específicas, acionáveis e apropriadas para o nível.";
             const userPrompt = `Gere uma análise de jogo completa para um atleta de Tênis de Mesa. Nível do Atleta: ${playerLevel}. Informações Adicionais (identificação no vídeo): ${additionalData}. Os timestamps para os exemplos de vídeo (start/end em segundos) devem ser curtos (5-15 segundos de duração) e plausíveis dentro de um jogo (e.g., entre 0 e 300 segundos). Para cada exemplo de vídeo, determine se o ponto foi ganho ou perdido e inclua '(Ponto Ganho)' ou '(Ponto Perdido)' no final da descrição. Forneça a resposta estritamente no formato JSON definido, com EXATAMENTE 3 pontos fortes, 3 pontos fracos, 4 valores para habilidades gerais e 4 para competências técnicas.`;
-            const schema = { type: "OBJECT", properties: { stage: { type: "STRING" }, s1_intro: { type: "STRING" }, s1_card_p1: { type: "STRING" }, s1_card_p2: { type: "STRING" }, strengths: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, weaknesses: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, final_comment: { type: "STRING" }, general_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, technical_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, s3_intro: { type: "STRING" }, recommendations: { type: "OBJECT", properties: { "Técnica": { type: "STRING" }, "Tática": { type: "STRING" }, "Físico": { type: "STRING" }, "Mental": { type: "STRING" } } }, video_examples: { type: "OBJECT", properties: { strengths: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, examples: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } } } }, weaknesses: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, examples: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } } } } } } } };
+            const schema = { type: "OBJECT", properties: { stage: { type: "STRING" }, s1_intro: { type: "STRING" }, s1_card_p1: { type: "STRING" }, s1_card_p2: { type: "STRING" }, strengths: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, weaknesses: { type: "ARRAY", items: { type: "STRING" }, minItems: 3, maxItems: 3 }, final_comment: { type: "STRING" }, general_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, technical_skills: { type: "ARRAY", items: { type: "NUMBER" }, minItems: 4, maxItems: 4 }, s3_intro: { type: "STRING" }, recommendations: { type: "OBJECT", properties: { "Técnica": { type: "STRING" }, "Tática": { type: "STRING" }, "Físico": { type: "STRING" }, "Mental": { type: "STRING" } } }, video_examples: { type: "OBJECT", properties: { strengths: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } }, weaknesses: { type: "ARRAY", items: { type: "OBJECT", properties: { title: { type: "STRING" }, examples: { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } } } } } } } } };
             const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
 
             try {
@@ -417,45 +417,6 @@
             button.textContent = 'Gerando...';
             const playerLevel = document.getElementById('player-level').value;
             const additionalData = document.getElementById('additional-data').value || 'atleta';
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const systemPrompt = "Você é um especialista em análise de Tênis de Mesa. Sua tarefa é gerar 3 exemplos de vídeo distintos e plausíveis (timestamps e descrições) para um ponto específico de uma análise (ponto forte ou a melhorar).";
-            const userPrompt = `Gere 3 novos exemplos de vídeo para o seguinte ponto de análise: "${title}". O atleta está no nível "${playerLevel}" e é identificado como "${additionalData}". Os timestamps (start/end em segundos) devem ser curtos (5-15 segundos) e plausíveis dentro de um jogo. Retorne apenas o array de exemplos em JSON.`;
-            const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { start: { type: "NUMBER" }, end: { type: "NUMBER" }, description: { type: "STRING" } } } };
-            const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
-                if (!response.ok) { const errorText = result?.error?.message || `A requisição à API falhou com o status ${response.status}`; throw new Error(errorText); }
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (jsonText) {
-                    const cleanJsonText = jsonText.match(/\{[\s\S]*\}/)?.[0] || jsonText;
-                    const newExamples = JSON.parse(cleanJsonText);
-                    if (Array.isArray(newExamples) && newExamples.length > 0) {
-                        const videoContainer = itemElement.querySelector('.video-container');
-                        videoContainer.dataset.videos = JSON.stringify(newExamples);
-                        const firstExample = newExamples[0];
-                        const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
-                        videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${firstExample.start}&end=${firstExample.end}`;
-                        videoContainer.querySelector('.editable-time:first-of-type').value = toMmss(firstExample.start);
-                        videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(firstExample.end);
-                        videoContainer.querySelector('.editable-text').value = newDescription;
-                        saveState();
-                        alert("Novos exemplos gerados com sucesso!");
-                    } else { throw new Error("A IA não retornou exemplos válidos."); }
-                } else { throw new Error("A resposta da IA estava vazia."); }
-            } catch (error) { console.error("Erro ao gerar novos exemplos:", error); alert(error.message || "Não foi possível gerar novos exemplos.");
-            } finally { button.disabled = false; button.textContent = 'Gerar Novos'; }
-        }
-
-        async function callGeminiToResync(event) {
-            const button = event.target;
-            const itemElement = button.closest('.video-item');
-            const description = itemElement.querySelector('.editable-text').value;
-            const title = itemElement.querySelector('.editable-title').value;
-            const apiKey = document.getElementById('api-key').value;
-            if (!apiKey) { alert("Por favor, insira sua Chave de API do Gemini para continuar."); return; }
-            button.disabled = true;
-            button.textContent = 'Sincronizando...';
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const systemPrompt = "Você é um assistente de análise de vídeo de Tênis de Mesa. Sua tarefa é encontrar o trecho de tempo (início e fim, em segundos) que melhor corresponde a uma descrição de jogada e determinar o resultado do ponto.";
             const userPrompt = `Analisando um vídeo de tênis de mesa, encontre o trecho de tempo (início e fim, em segundos) que melhor corresponde ao ponto de análise "${title}", descrito como: "${description}". O clipe deve ter duração suficiente para mostrar o ponto completo. Além disso, determine se o ponto foi ganho ou perdido pelo jogador em foco e atualize a descrição para incluir '(Ponto Ganho)' ou '(Ponto Perdido)' no final. Retorne um objeto JSON com 'start', 'end' e 'new_description'.`;
@@ -570,7 +531,7 @@
                             <button class="btn-primary update-video">Atualizar</button>
                             <button class="btn-example change-example flex-grow">Ver Outro</button>
                             <button class="btn-accent generate-examples flex-grow">Gerar Novos</button>
-                            <button class="btn-resync resync-video flex-grow">Resincronizar</button>
+                            <button class="btn-resync resincronizar flex-grow">Resincronizar</button>
                         </div>
                     </div>
                 </div>
@@ -620,7 +581,7 @@
                     const item = e.target.closest('.video-item');
                     const start = toSeconds(item.querySelector('.editable-time:first-of-type').value);
                     const end = toSeconds(item.querySelector('.editable-time:last-of-type').value);
-                    const videoId = extractYouTubeID(youtubeUrlInput.value) || 'Iyaon7rUS-Q';
+                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
                     item.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${Math.round(start)}&end=${Math.round(end)}`;
                     saveState();
                 });
@@ -721,23 +682,17 @@
         };
 
         window.savePreliminarReport = () => { saveState(); alert('Relatório preliminar atualizado com sucesso!'); };
-		window.generateFinalReport = async () => {
+        window.generateFinalReport = async () => {
             saveState();
-            const dataToSave = loadState();
+            const dataToSave = loadState(); 
             if (!dataToSave) {
                 alert("Nenhum dado para salvar. Processe uma análise primeiro.");
                 return;
             }
-            
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => button.disabled = true);
-            
             const finalDoc = document.cloneNode(true);
             renderStaticReport(finalDoc, dataToSave);
             finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
-            
             finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
-            
             const chartRenderScript = finalDoc.createElement('script');
             chartRenderScript.textContent = `
                 document.addEventListener('DOMContentLoaded', () => {
@@ -762,57 +717,21 @@
                 });
             `;
             finalDoc.body.appendChild(chartRenderScript);
-            
             const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
-            const apiUrl = 'https://pdf-gerador-859367579735.us-central1.run.app/api/gerar-pdf';
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/html'
-                    },
-                    body: finalHtml
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'analise-de-jogo-final.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                alert('Relatório final gerado e baixado com sucesso!');
-
-            } catch (error) {
-                console.error("Erro ao gerar o PDF:", error);
-                alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
-            } finally {
-                const editableElements = document.querySelectorAll('input, textarea');
-                editableElements.forEach(el => {
-                    el.disabled = true;
-                });
-                const buttons = document.querySelectorAll('button');
-                buttons.forEach(el => {
-                    el.disabled = true;
-                    el.style.display = 'none';
-                });
-                const finalDocForRender = document.cloneNode(true);
-                renderStaticReport(finalDocForRender, dataToSave);
-                document.body.innerHTML = finalDocForRender.body.innerHTML;
-            }
+            const blob = new Blob([finalHtml], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'analise-de-jogo-final.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            alert('Relatório final gerado e baixado com sucesso!');
         };
-
+        
         const savedData = loadState();
         initializePage(savedData);
     });
 </script>
 </body>
 </html>
-```
