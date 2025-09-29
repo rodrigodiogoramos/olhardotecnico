@@ -1,4 +1,4 @@
-# Use a imagem base oficial do Python.
+# Use a imagem base oficial do Python
 FROM python:3.11
 
 # Define o diretório de trabalho no contêiner
