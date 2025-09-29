@@ -1,3 +1,14 @@
+Analisei o arquivo `rela1.html` que você forneceu. O código que você tem é a versão anterior que tenta abrir o relatório em uma nova aba, o que não atende ao seu requisito de gerar um download em PDF. Para resolver isso, o Front-end precisa se comunicar com o Back-end que você acabou de criar.
+
+Ajustei o código para que o botão **"Gerar Relatório Final"** envie uma requisição ao seu microsserviço no Google Cloud, que, por sua vez, retornará um arquivo PDF que será baixado automaticamente pelo navegador do usuário. A nova versão do código também passa a desabilitar a edição da página após a geração do relatório, cumprindo seu requisito de "finalizar" a edição.
+
+-----
+
+### **Código do Relatório Final (`rela.html`)**
+
+Substitua todo o conteúdo do seu arquivo `rela1.html` pelo código abaixo. Lembre-se de substituir a URL da API pela URL real do seu serviço no Google Cloud Run, que você encontrou na sua última interação.
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
@@ -634,7 +645,7 @@
                     const currentStart = toSeconds(startInput.value);
                     const currentIndex = videoSet.findIndex(v => Math.round(v.start) === Math.round(currentStart));
                     const nextVideo = videoSet[(currentIndex + 1) % videoSet.length];
-                    const videoId = extractYouTubeID(youtubeUrlInput.value) || 'Iyaon7rUS-Q';
+                    const videoId = extractYouTubeID(document.getElementById('youtube-url').value) || 'Iyaon7rUS-Q';
                     videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${nextVideo.start}&end=${nextVideo.end}`;
                     startInput.value = toMmss(nextVideo.start);
                     videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(nextVideo.end);
@@ -769,3 +780,5 @@
 </body>
 </html>
 }
+}
+```
