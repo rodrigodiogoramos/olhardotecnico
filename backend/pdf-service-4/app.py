@@ -1,5 +1,6 @@
 import os
 import io
+import uuid # Importa o módulo uuid
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from weasyprint import HTML
@@ -21,20 +22,18 @@ def generate_pdf():
         if not BUCKET_NAME:
             raise ValueError("CLOUD_STORAGE_BUCKET environment variable is not set.")
 
-        # 1. Recebe o HTML do corpo da requisição
         html_content = request.data.decode('utf-8')
-
-        # 2. Converte o HTML para PDF
         pdf_file = HTML(string=html_content).write_pdf()
 
-        # 3. Armazena o PDF no Google Cloud Storage
         storage_client = storage.Client()
         bucket = storage_client.bucket(BUCKET_NAME)
-        blob = bucket.blob('relatorios/relatorio.pdf')
-
+        
+        # Gera um nome de arquivo único usando UUID
+        unique_filename = f"relatorios/{uuid.uuid4()}.pdf"
+        
+        blob = bucket.blob(unique_filename)
         blob.upload_from_file(io.BytesIO(pdf_file), content_type='application/pdf')
         
-        # 4. Retorna a URL pública do arquivo
         public_url = blob.public_url
 
         return jsonify({'message': 'PDF gerado e armazenado com sucesso!', 'pdf_url': public_url}), 200

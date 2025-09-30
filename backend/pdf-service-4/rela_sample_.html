@@ -41,6 +41,23 @@
             color: #777;
             margin-top: 30px;
         }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .send-report-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .send-report-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -60,11 +77,52 @@
         <img src="https://images.unsplash.com/photo-1572520862080-b26a117b9b1d" alt="Cena de E-commerce">
         <p>Esta imagem foi inserida para testar a capacidade do gerador de PDF de renderizar conteúdo visualmente.</p>
     </div>
-
     <div class="footer">
         <p>Relatório gerado automaticamente por um microserviço no Google Cloud.</p>
         <p>&copy; 2025 Olhar do Técnico. Todos os direitos reservados.</p>
     </div>
+    
+    <div class="button-container">
+        <button id="generate-pdf-btn" class="send-report-btn">Gerar Relatório Final</button>
+    </div>
+    
+    <script>
+        document.getElementById('generate-pdf-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('generate-pdf-btn');
+            btn.disabled = true;
+            btn.textContent = 'Gerando...';
 
+            const htmlContent = document.documentElement.outerHTML;
+            const apiUrl = 'https://pdf-service-859367579735.us-central1.run.app/generate-pdf';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/html'
+                    },
+                    body: htmlContent
+                });
+                
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`PDF gerado e armazenado com sucesso! URL: ${result.pdf_url}`);
+                    window.open(result.pdf_url, '_blank');
+                    btn.textContent = 'Relatório Gerado!';
+                } else {
+                    alert('Ocorreu um erro ao gerar o relatório: ' + result.error);
+                    btn.disabled = false;
+                    btn.textContent = 'Gerar Relatório Final';
+                }
+
+            } catch (error) {
+                console.error("Erro na comunicação com a API:", error);
+                alert('Ocorreu um erro de rede. Verifique sua conexão e a URL da API.');
+                btn.disabled = false;
+                btn.textContent = 'Gerar Relatório Final';
+            }
+        });
+    </script>
 </body>
 </html>
