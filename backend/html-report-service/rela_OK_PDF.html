@@ -214,7 +214,7 @@
         <section id="automated-analysis" class="section-container">
             <h2 class="section-title">Análise de Jogo</h2>
             <div class="input-group">
-                <input type="password" id="api-key" placeholder="Cole sua Chave de API do Gemini aqui" value="AIzaSyCEbfAAbJ1KtR3hV-0fRrN9p4LZtZCvf0Q">
+                <input type="password" id="api-key" placeholder="Cole sua Chave de API do Gemini aqui" value="AIzaSyCEbfAAbJ1KtR3hV-0fRrN9p9LZtZCvf0Q">
                 <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-sm text-blue-600 whitespace-nowrap">Alterar Chave</a>
             </div>
             <div class="input-group">
@@ -350,48 +350,12 @@
         </section>
     </main>
    
-    <div class="button-container">
-        <button id="generate-pdf-btn" class="send-report-btn">Gerar Relatório Final</button>
+    <div class="button-container hidden">
+        <button id="generate-pdf-btn" class="send-report-btn">Enviar Relatório Final</button>
     </div>
     
     <script>
-        document.getElementById('generate-pdf-btn').addEventListener('click', async () => {
-            const btn = document.getElementById('generate-pdf-btn');
-            btn.disabled = true;
-            btn.textContent = 'Gerando...';
-
-            const htmlContent = document.documentElement.outerHTML;
-            const apiUrl = 'https://pdf-service-859367579735.us-central1.run.app/generate-pdf';
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/html'
-                    },
-                    body: htmlContent
-                });
-                
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(`PDF gerado e armazenado com sucesso! URL: ${result.pdf_url}`);
-                    window.open(result.pdf_url, '_blank');
-                    btn.textContent = 'Relatório Gerado!';
-                } else {
-                    alert('Ocorreu um erro ao gerar o relatório: ' + result.error);
-                    btn.disabled = false;
-                    btn.textContent = 'Gerar Relatório Final';
-                }
-
-            } catch (error) {
-                console.error("Erro na comunicação com a API:", error);
-                alert('Ocorreu um erro de rede. Verifique sua conexão e a URL da API.');
-                btn.disabled = false;
-                btn.textContent = 'Gerar Relatório Final';
-            }
-        });
-		    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
         const storageKey = 'analise-jogo-dados-v3';
         let generalSkillsChart, technicalSkillsChart;
 
@@ -561,7 +525,7 @@
             strengths.forEach((item, index) => { if (strengthCells[index]) strengthCells[index].value = item; });
             const weaknessCells = document.querySelectorAll('[data-id^="s1-t1-r"][data-id$="c2"]');
             const weaknesses = (Array.isArray(data.weaknesses) ? data.weaknesses : []).slice(0, 3);
-            weaknesses.forEach((item, index) => { if (weaknessCells[index]) weaknessCells[index].value = item; });
+            weaknesses.forEach((item, index) => { if (weaknessCells[index]) weaknesses[index].value = item; });
             document.getElementById('s2-intro').value = `A avaliação do jogo resultou nas seguintes notas...`;
             const generalSkills = (Array.isArray(data.general_skills) ? data.general_skills : [0,0,0,0]).slice(0, 4);
             const generalInputs = document.querySelectorAll('.editable-chart-value[data-chart="general"]');
@@ -650,7 +614,15 @@
         };
         
         const saveState = () => {
-            const data = { sections: {}, videos: {}, charts: { general: [], technical: [] }, videoUrl: document.getElementById('youtube-url').value, playerLevel: document.getElementById('player-level').value, additionalData: document.getElementById('additional-data').value };
+            const data = { 
+                sections: {}, 
+                videos: {}, 
+                charts: { general: [], technical: [] }, 
+                videoUrl: document.getElementById('youtube-url').value, 
+                playerLevel: document.getElementById('player-level').value, 
+                additionalData: document.getElementById('additional-data').value,
+                isFinalReport: !document.querySelector('.button-container').classList.contains('hidden')
+            };
             document.querySelectorAll('.editable-general-text, .editable-table-cell, .editable-list-item-title, .editable-list-item-desc').forEach(el => { data.sections[el.id || el.dataset.id] = el.value; });
             document.querySelectorAll('.video-item').forEach(item => {
                 const id = item.dataset.id;
@@ -700,7 +672,7 @@
                     videoContainer.querySelector('iframe').src = `https://www.youtube.com/embed/${videoId}?start=${nextVideo.start}&end=${nextVideo.end}`;
                     startInput.value = toMmss(nextVideo.start);
                     videoContainer.querySelector('.editable-time:last-of-type').value = toMmss(nextVideo.end);
-                    videoContainer.querySelector('.editable-text').value = newDescription;
+                    videoContainer.querySelector('.editable-text').value = nextVideo.description;
                     saveState();
                 });
             });
@@ -715,7 +687,10 @@
         }
         
         function initializePage(data) {
-             if (!data) { createCharts({charts: { general: [0,0,0,0], technical: [0,0,0,0]}}); return; }
+             if (!data) { 
+                createCharts({charts: { general: [0,0,0,0], technical: [0,0,0,0]}}); 
+                return; 
+            }
              document.getElementById('youtube-url').value = data.videoUrl || 'https://www.youtube.com/watch?v=Iyaon7rUS-Q';
              document.getElementById('player-level').value = data.playerLevel || 'Alto Rendimento';
              document.getElementById('additional-data').value = data.additionalData || 'camiseta rosa';
@@ -736,6 +711,13 @@
             };
             videoContainer.innerHTML = createVideoExamplesHTML(videoData);
             bindReportEventListeners();
+
+            if (data.isFinalReport) {
+                const finalButtonContainer = document.querySelector('.button-container');
+                if (finalButtonContainer) {
+                    finalButtonContainer.classList.remove('hidden');
+                }
+            }
         }
 
         const renderStaticReport = (doc, data) => {
@@ -784,95 +766,122 @@
 
         window.savePreliminarReport = () => { saveState(); alert('Relatório preliminar atualizado com sucesso!'); };
 		window.generateFinalReport = async () => {
-            saveState();
-            const dataToSave = loadState();
-            if (!dataToSave) {
-                alert("Nenhum dado para salvar. Processe uma análise primeiro.");
-                return;
+			saveState();
+			const dataToSave = loadState();
+
+			if (!dataToSave) {
+				alert("Nenhum dado para salvar. Processe uma análise primeiro.");
+				return;
+			}
+			const finalDocForRender = document.cloneNode(true);
+			renderStaticReport(finalDocForRender, dataToSave);
+			
+			const chartRenderScript = finalDocForRender.createElement('script');
+			chartRenderScript.textContent = `
+				document.addEventListener('DOMContentLoaded', () => {
+					const finalData = ${JSON.stringify(dataToSave)};
+					const chartOptions = {
+                        scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 10, pointLabels: { font: { size: 14, weight: 'bold' }, color: '#4a5568' }, grid: { color: 'rgba(203, 213, 225, 0.5)' }, ticks: { backdropColor: 'rgba(255, 255, 255, 0.8)', stepSize: 2 } } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }
+					};
+					if(document.getElementById('generalSkillsChart')) { 
+						new Chart(document.getElementById('generalSkillsChart'), { 
+							type: 'radar', 
+							data: { 
+								labels: ['Técnica', 'Tática', 'Físico', 'Mental'], 
+								datasets: [{ 
+									label: 'Habilidades Gerais', 
+									data: finalData.charts.general, 
+									backgroundColor: 'rgba(59, 130, 246, 0.2)', 
+									borderColor: 'rgba(59, 130, 246, 1)', 
+									borderWidth: 2 
+								}] 
+							}, 
+							options: chartOptions 
+						}); 
+					}
+					if(document.getElementById('technicalSkillsChart')) { 
+						new Chart(document.getElementById('technicalSkillsChart'), { 
+							type: 'radar', 
+							data: { 
+								labels: ['Forehand', 'Backhand', 'Saque', 'Efeito'], 
+								datasets: [{ 
+									label: 'Competências Técnicas', 
+									data: finalData.charts.technical, 
+									backgroundColor: 'rgba(239, 68, 68, 0.2)', 
+									borderColor: 'rgba(239, 68, 68, 1)', 
+									borderWidth: 2 
+								}] 
+							}, 
+							options: chartOptions 
+						}); 
+					}
+				});
+			`;
+			
+			finalDocForRender.querySelectorAll('script').forEach(script => { 
+				if (!script.src || (!script.src.includes('chart.js') && !script.src.includes('tailwindcss'))) { 
+					script.remove(); 
+				} 
+			});
+            const chartJsScript = finalDocForRender.createElement('script');
+            chartJsScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            finalDocForRender.head.appendChild(chartJsScript);
+
+			finalDocForRender.body.appendChild(chartRenderScript);
+
+			document.body.innerHTML = finalDocForRender.body.innerHTML;
+
+            const finalButtonContainer = document.querySelector('.button-container');
+            if (finalButtonContainer) {
+                finalButtonContainer.classList.remove('hidden');
             }
-            
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => button.disabled = true);
-            
-            const finalDoc = document.cloneNode(true);
-            renderStaticReport(finalDoc, dataToSave);
-            finalDoc.querySelector('title').textContent = 'Relatório de Análise Final';
-            
-            finalDoc.querySelectorAll('script').forEach(script => { if (!script.src || !script.src.includes('chart.js')) { script.remove(); } });
-            
-            const chartRenderScript = finalDoc.createElement('script');
-            chartRenderScript.textContent = `
-                document.addEventListener('DOMContentLoaded', () => {
-                    const finalData = ${JSON.stringify(dataToSave)};
-                    const chartOptions = {
-                        scales: {
-                            r: {
-                                angleLines: { display: true },
-                                suggestedMin: 0,
-                                suggestedMax: 10,
-                                pointLabels: { font: { size: 14, weight: 'bold' }, color: '#4a5568' },
-                                grid: { color: 'rgba(203, 213, 225, 0.5)' },
-                                ticks: { backdropColor: 'rgba(255, 255, 255, 0.8)', stepSize: 2 }
-                            }
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    };
-                    if(document.getElementById('generalSkillsChart')) { new Chart(document.getElementById('generalSkillsChart'), { type: 'radar', data: { labels: ['Técnica', 'Tática', 'Físico', 'Mental'], datasets: [{ label: 'Habilidades Gerais', data: finalData.charts.general, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 2 }] }, options: chartOptions }); }
-                    if(document.getElementById('technicalSkillsChart')) { new Chart(document.getElementById('technicalSkillsChart'), { type: 'radar', data: { labels: ['Forehand', 'Backhand', 'Saque', 'Efeito'], datasets: [{ label: 'Competências Técnicas', data: finalData.charts.technical, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgba(239, 68, 68, 1)', borderWidth: 2 }] }, options: chartOptions }); }
-                });
-            `;
-            finalDoc.body.appendChild(chartRenderScript);
-            
-            const finalHtml = '<!DOCTYPE html>\n' + finalDoc.documentElement.outerHTML;
-            const apiUrl = 'https://pdf-gerador-859367579735.us-central1.run.app/api/gerar-pdf';
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/html'
-                    },
-                    body: finalHtml
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro do servidor: ${response.status} ${response.statusText}`);
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'analise-de-jogo-final.pdf';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                alert('Relatório final gerado e baixado com sucesso!');
-
-            } catch (error) {
-                console.error("Erro ao gerar o PDF:", error);
-                alert("Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.");
-            } finally {
-                const editableElements = document.querySelectorAll('input, textarea');
-                editableElements.forEach(el => {
-                    el.disabled = true;
-                });
-                const buttons = document.querySelectorAll('button');
-                buttons.forEach(el => {
-                    el.disabled = true;
-                    el.style.display = 'none';
-                });
-                const finalDocForRender = document.cloneNode(true);
-                renderStaticReport(finalDocForRender, dataToSave);
-                document.body.innerHTML = finalDocForRender.body.innerHTML;
-            }
-        };
+			
+			alert('Relatório final gerado. A página foi atualizada para a visualização final.');
+		};
 
         const savedData = loadState();
         initializePage(savedData);
+
+        // O código a ser restaurado para o botão 'Gerar PDF'
+        document.addEventListener('click', async (event) => {
+            if (event.target && event.target.id === 'generate-pdf-btn') {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = 'Gerando...';
+
+                const htmlContent = document.documentElement.outerHTML;
+                const apiUrl = 'https://pdf-service-859367579735.us-central1.run.app/generate-pdf';
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/html'
+                        },
+                        body: htmlContent
+                    });
+                    
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(`PDF gerado e armazenado com sucesso! URL: ${result.pdf_url}`);
+                        window.open(result.pdf_url, '_blank');
+                        btn.textContent = 'Relatório Gerado!';
+                    } else {
+                        alert('Ocorreu um erro ao gerar o relatório: ' + result.error);
+                        btn.disabled = false;
+                        btn.textContent = 'Enviar Relatório Final';
+                    }
+
+                } catch (error) {
+                    console.error("Erro na comunicação com a API:", error);
+                    alert('Ocorreu um erro de rede. Verifique sua conexão e a URL da API.');
+                    btn.disabled = false;
+                    btn.textContent = 'Enviar Relatório Final';
+                }
+            }
+        });
+
     });
 
     </script>
