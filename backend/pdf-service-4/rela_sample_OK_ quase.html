@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -177,17 +177,40 @@
             border: 1px solid #cbd5e0;
             border-radius: 4px;
         }
+		
+		        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .send-report-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .send-report-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
     </style>
 </head>
 <body>
 
-<div class="container">
+    <div class="container">
     <header class="text-center py-8">
         <h1 class="text-3xl md:text-5xl font-extrabold text-custom-blue mb-2">A Jornada de um Atleta</h1>
         <p class="text-lg text-gray-600">Relatório de Análise de Jogo - Tênis de Mesa</p>
     </header>
 
-    <main>
+
+        <div class="summary">
+            <h2>Sumário da Análise</h2>
+            <p>Este documento é um relatório de teste para a conversão de HTML para PDF. O objetivo é validar o funcionamento completo do microserviço, desde a requisição de URL até a geração do documento e o envio por e-mail.</p>
+        </div>
+		
+		    <main>
         <section id="automated-analysis" class="section-container">
             <h2 class="section-title">Análise de Jogo</h2>
             <div class="input-group">
@@ -326,10 +349,49 @@
             </div>
         </section>
     </main>
-</div>
+   
+    <div class="button-container">
+        <button id="generate-pdf-btn" class="send-report-btn">Gerar Relatório Final</button>
+    </div>
+    
+    <script>
+        document.getElementById('generate-pdf-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('generate-pdf-btn');
+            btn.disabled = true;
+            btn.textContent = 'Gerando...';
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
+            const htmlContent = document.documentElement.outerHTML;
+            const apiUrl = 'https://pdf-service-859367579735.us-central1.run.app/generate-pdf';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/html'
+                    },
+                    body: htmlContent
+                });
+                
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(`PDF gerado e armazenado com sucesso! URL: ${result.pdf_url}`);
+                    window.open(result.pdf_url, '_blank');
+                    btn.textContent = 'Relatório Gerado!';
+                } else {
+                    alert('Ocorreu um erro ao gerar o relatório: ' + result.error);
+                    btn.disabled = false;
+                    btn.textContent = 'Gerar Relatório Final';
+                }
+
+            } catch (error) {
+                console.error("Erro na comunicação com a API:", error);
+                alert('Ocorreu um erro de rede. Verifique sua conexão e a URL da API.');
+                btn.disabled = false;
+                btn.textContent = 'Gerar Relatório Final';
+            }
+        });
+		    document.addEventListener('DOMContentLoaded', () => {
         const storageKey = 'analise-jogo-dados-v3';
         let generalSkillsChart, technicalSkillsChart;
 
@@ -812,6 +874,7 @@
         const savedData = loadState();
         initializePage(savedData);
     });
-</script>
+
+    </script>
 </body>
 </html>
